@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <title>StudyTracker — Daily Study & Homework Tracker (Nepali, Maths, English, Computer, Economics, Accounts)</title>
+  <meta name="description" content="A fast, private, printable daily study tracker for students. Plan reading, homework, and practice for Nepali, Maths, English, Computer, Economics, and Accounts — saved locally in your browser." />
+  <link rel="canonical" href="https://example.com/" />
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+
+  <!-- Social preview (optional but professional). Replace with real values if you add an OG image. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="StudyTracker — Daily Study & Homework Tracker" />
+  <meta property="og:description" content="Plan reading, homework, and practice for 6 subjects. Private by default. Printable daily report." />
+  <meta property="og:url" content="https://example.com/" />
+  <!-- <meta property="og:image" content="https://example.com/og-studytracker.webp" /> -->
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Theme colour (helps browser UI). -->
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+
+  <!-- Ultra-light favicon (inline SVG). -->
+  <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' rx='14' fill='%23111827'/%3E%3Cpath d='M18 20h20a8 8 0 0 1 8 8v16a0 0 0 0 1 0 0H26a8 8 0 0 1-8-8V20z' fill='%2322c55e'/%3E%3Cpath d='M22 26h22v4H22zm0 8h18v4H22z' fill='white'/%3E%3C/svg%3E" />
+
+  <!-- Structured data (JSON-LD) describing the web app. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["SoftwareApplication", "WebApplication"],
+    "name": "StudyTracker",
+    "description": "A fast, private, printable daily study tracker for Nepali, Maths, English, Computer, Economics, and Accounts. Saves data locally in the browser.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Web",
+    "url": "https://example.com/",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "GBP"
+    }
+  }
+  </script>
+
+  <!-- CRITICAL CSS (kept small; no external frameworks). -->
+  <style>
+    /* ========== Design tokens ========== */
+    :root{
+      color-scheme: light dark;
+      --bg: #ffffff;
+      --fg: #0b1220;
+      --muted: #475569;
+      --card: #f8fafc;
+      --border: #e2e8f0;
+      --shadow: 0 10px 30px rgba(2,6,23,.08);
+      --accent: #16a34a;
+      --accent-2: #2563eb;
+      --danger: #dc2626;
+      --focus: #7c3aed;
+      --radius: 16px;
+      --maxw: 1080px;
+      --gap: 16px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0b1220;
+        --fg:#e5e7eb;
+        --muted:#94a3b8;
+        --card:#0f172a;
+        --border:#1f2937;
+        --shadow: 0 10px 30px rgba(0,0,0,.35);
+        --accent:#22c55e;
+        --accent-2:#60a5fa;
+        --danger:#f87171;
+        --focus:#c084fc;
+      }
+    }
+    html[data-theme="light"]{
+      color-scheme: light;
+      --bg: #ffffff;
+      --fg: #0b1220;
+      --muted: #475569;
+      --card: #f8fafc;
+      --border: #e2e8f0;
+      --shadow: 0 10px 30px rgba(2,6,23,.08);
+      --accent: #16a34a;
+      --accent-2: #2563eb;
+      --danger: #dc2626;
+      --focus: #7c3aed;
+    }
+    html[data-theme="dark"]{
+      color-scheme: dark;
+      --bg:#0b1220;
+      --fg:#e5e7eb;
+      --muted:#94a3b8;
+      --card:#0f172a;
+      --border:#1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --accent:#22c55e;
+      --accent-2:#60a5fa;
+      --danger:#f87171;
+      --focus:#c084fc;
+    }
+
+    /* ========== Base styles ========== */
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font: 16px/1.55 var(--font);
+      background: var(--bg);
+      color: var(--fg);
+    }
+    a{ color: var(--accent-2); text-decoration-thickness: .08em; text-underline-offset: .18em; }
+    a:hover{ text-decoration-thickness: .12em; }
+    .container{ max-width: var(--maxw); margin: 0 auto; padding: 0 16px; }
+    .skip-link{
+      position:absolute; left:-999px; top:12px;
+      background: var(--fg); color: var(--bg);
+      padding: 10px 12px; border-radius: 10px;
+      z-index: 999;
+    }
+    .skip-link:focus{ left: 12px; outline: 3px solid var(--focus); outline-offset: 3px; }
+
+    :focus-visible{ outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 10px; }
+
+    header{
+      position: sticky; top: 0; z-index: 20;
+      background: color-mix(in oklab, var(--bg) 92%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px; padding: 12px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight: 800; letter-spacing: .2px;
+    }
+    .brand svg{ width: 28px; height: 28px; flex: 0 0 auto; }
+    nav ul{
+      list-style:none; margin:0; padding:0;
+      display:flex; flex-wrap:wrap; gap: 10px;
+    }
+    nav a{
+      display:inline-block;
+      padding: 8px 10px;
+      border-radius: 12px;
+      color: var(--fg);
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+    nav a:hover{
+      background: color-mix(in oklab, var(--card) 80%, transparent);
+      border-color: var(--border);
+    }
+
+    .btn{
+      appearance:none; border: 1px solid var(--border);
+      background: var(--fg); color: var(--bg);
+      border-radius: 14px; padding: 10px 12px;
+      font-weight: 700; cursor:pointer;
+      box-shadow: var(--shadow);
+    }
+    .btn.secondary{
+      background: transparent; color: var(--fg);
+      box-shadow: none;
+    }
+    .btn.danger{
+      background: transparent; color: var(--danger);
+      border-color: color-mix(in oklab, var(--danger) 45%, var(--border));
+      box-shadow: none;
+    }
+    .btn:disabled{ opacity: .55; cursor:not-allowed; }
+
+    .hero{
+      padding: 28px 0 18px;
+      background:
+        radial-gradient(800px 220px at 20% 0%, color-mix(in oklab, var(--accent) 25%, transparent), transparent),
+        radial-gradient(700px 240px at 90% 10%, color-mix(in oklab, var(--accent-2) 20%, transparent), transparent);
+    }
+    .hero-grid{
+      display:grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+      align-items:center;
+      padding: 16px 0 6px;
+    }
+    @media (min-width: 900px){
+      .hero-grid{ grid-template-columns: 1.2fr .8fr; }
+    }
+    h1{ margin:0 0 10px; font-size: clamp(28px, 2.8vw, 42px); line-height:1.1; letter-spacing: -0.02em; }
+    .lead{ color: var(--muted); font-size: 1.05rem; margin: 0 0 14px; }
+    .cta-row{ display:flex; flex-wrap:wrap; gap: 12px; align-items:center; }
+    .pill{
+      display:inline-flex; gap: 8px; align-items:center;
+      padding: 8px 10px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--card) 65%, transparent);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .mock{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: color-mix(in oklab, var(--card) 75%, transparent);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .mock .mock-head{
+      padding: 10px 12px; display:flex; align-items:center; justify-content:space-between;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .mock .mock-body{ padding: 12px; }
+
+    section{ padding: 22px 0; }
+    h2{ margin:0 0 10px; font-size: 1.35rem; letter-spacing: -0.01em; }
+    .grid-3{
+      display:grid; gap: var(--gap);
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 900px){
+      .grid-3{ grid-template-columns: repeat(3, 1fr); }
+    }
+    .card{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: color-mix(in oklab, var(--card) 92%, transparent);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .card p{ margin: 8px 0 0; color: var(--muted); }
+
+    /* ========== Tracker form ========== */
+    .tracker-head{
+      display:flex; flex-wrap:wrap; gap: 12px; align-items:end; justify-content:space-between;
+    }
+    .field{
+      display:flex; flex-direction:column; gap: 6px;
+      min-width: 220px;
+    }
+    label{ font-weight: 700; font-size: .95rem; }
+    input, select, textarea{
+      width:100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 11px;
+      font: inherit;
+      background: color-mix(in oklab, var(--bg) 92%, transparent);
+      color: var(--fg);
+    }
+    textarea{ min-height: 74px; resize: vertical; }
+
+    .tracker-actions{ display:flex; flex-wrap:wrap; gap: 10px; align-items:center; }
+    .statusline{ color: var(--muted); font-size: .95rem; }
+    .statusline strong{ color: var(--fg); }
+
+    .progress-wrap{
+      display:flex; flex-wrap:wrap; gap: 12px; align-items:center; justify-content:space-between;
+      margin-top: 12px;
+    }
+    progress{ width: min(520px, 100%); height: 18px; }
+    .small{ font-size: .92rem; color: var(--muted); margin: 8px 0 0; }
+
+    .slots{
+      display:grid; gap: var(--gap);
+      grid-template-columns: 1fr;
+      margin-top: 14px;
+    }
+    @media (min-width: 950px){
+      .slots{ grid-template-columns: 1fr 1fr; }
+    }
+    .slot{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: color-mix(in oklab, var(--bg) 90%, transparent);
+      padding: 14px;
+    }
+    .slot-top{
+      display:flex; gap: 10px; align-items:flex-start; justify-content:space-between;
+      margin-bottom: 8px;
+    }
+    .slot-top .time{
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+    .slot-top .hint{
+      color: var(--muted);
+      font-size: .92rem;
+      margin-top: 2px;
+    }
+    .slot-grid{
+      display:grid; grid-template-columns: 1fr; gap: 10px;
+    }
+    @media (min-width: 520px){
+      .slot-grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ========== Reminders ========== */
+    .callout{
+      border-left: 4px solid var(--accent);
+      padding: 12px 12px;
+      background: color-mix(in oklab, var(--accent) 10%, var(--card));
+      border-radius: var(--radius);
+      color: var(--muted);
+    }
+    .callout strong{ color: var(--fg); }
+    .rem-grid{ display:grid; gap: var(--gap); grid-template-columns: 1fr; }
+    @media (min-width: 900px){ .rem-grid{ grid-template-columns: 1fr 1fr; } }
+
+    .toast{
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      max-width: min(560px, calc(100vw - 32px));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: color-mix(in oklab, var(--bg) 92%, transparent);
+      box-shadow: var(--shadow);
+      padding: 12px 12px;
+      display:none;
+    }
+    .toast[aria-hidden="false"]{ display:block; }
+    .toast .t-title{ font-weight: 900; margin: 0 0 4px; }
+    .toast .t-body{ margin:0; color: var(--muted); }
+
+    footer{
+      border-top: 1px solid var(--border);
+      padding: 22px 0 30px;
+      color: var(--muted);
+    }
+
+    /* ========== Print styles (Printable daily report) ========== */
+    @media print{
+      header, nav, .hero, .no-print, .toast{ display:none !important; }
+      body{ background:#fff; color:#000; }
+      .card, .slot, .mock{
+        box-shadow:none !important;
+        border-color:#bbb !important;
+        background:#fff !important;
+      }
+      .container{ max-width: 100% !important; }
+      @page{ size: A4; margin: 12mm; }
+      a{ color:#000; text-decoration:none; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+    }
+  </style>
+
+  <!-- Optional: Add preconnect ONLY if you actually introduce external origins.
+  <link rel="preconnect" href="https://example-cdn.com" crossorigin />
+  -->
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header>
+    <div class="container topbar">
+      <div class="brand" aria-label="StudyTracker home">
+        <!-- Logo -->
+        <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <rect x="2" y="2" width="60" height="60" rx="14" fill="currentColor" opacity=".92"></rect>
+          <path d="M18 20h20a8 8 0 0 1 8 8v16H26a8 8 0 0 1-8-8V20z" fill="#22c55e"></path>
+          <path d="M22 26h22v4H22zm0 8h18v4H22z" fill="#fff"></path>
+        </svg>
+        <span>StudyTracker</span>
+      </div>
+
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#tracker">Tracker</a></li>
+          <li><a href="#reminders">Reminders</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+        </ul>
+      </nav>
+
+      <div class="cta-row no-print">
+        <button class="btn secondary" id="themeBtn" type="button" aria-label="Toggle colour theme">
+          Theme
+        </button>
+        <a class="btn" href="#tracker">Start today</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="hero">
+      <div class="container hero-grid">
+        <div>
+          <h1>Daily study & homework tracker for 6 subjects</h1>
+          <p class="lead">
+            Plan and record what you did each day (reading chapters, homework completed, practice sessions) for
+            <strong>Nepali, Maths, English, Computer, Economics, and Accounts</strong>.
+            Your data stays on your device and prints cleanly.
+          </p>
+
+          <div class="cta-row no-print">
+            <a class="btn" href="#tracker">Open today’s tracker</a>
+            <button class="btn secondary" type="button" id="printBtn">Print daily report</button>
+            <span class="pill" title="No sign-up • No trackers • Local storage">
+              ✅ Private-by-default • ⚡ Fast • 🖨️ Printable
+            </span>
+          </div>
+
+          <p class="small">
+            Works best over HTTPS (needed for desktop notifications). If you need guaranteed alarms, use Windows alarms as well.
+          </p>
+        </div>
+
+        <!-- Inline SVG mockup (decorative). -->
+        <div class="mock" aria-label="Preview mockup">
+          <div class="mock-head">
+            <span>Preview</span>
+            <span aria-hidden="true">Today</span>
+          </div>
+          <div class="mock-body">
+            <svg viewBox="0 0 500 240" width="100%" height="auto" role="img" aria-label="Study tracker mockup illustration">
+              <defs>
+                <linearGradient id="g" x1="0" x2="1">
+                  <stop offset="0" stop-color="#22c55e" stop-opacity=".9"/>
+                  <stop offset="1" stop-color="#60a5fa" stop-opacity=".9"/>
+                </linearGradient>
+              </defs>
+              <rect x="10" y="12" width="480" height="216" rx="16" fill="url(#g)" opacity=".18"/>
+              <rect x="24" y="26" width="452" height="46" rx="14" fill="rgba(15,23,42,.22)"/>
+              <rect x="24" y="82" width="452" height="46" rx="14" fill="rgba(15,23,42,.18)"/>
+              <rect x="24" y="138" width="452" height="46" rx="14" fill="rgba(15,23,42,.14)"/>
+              <g fill="rgba(255,255,255,.92)">
+                <circle cx="52" cy="49" r="10"/><rect x="74" y="42" width="180" height="14" rx="7"/>
+                <circle cx="52" cy="105" r="10"/><rect x="74" y="98" width="250" height="14" rx="7"/>
+                <circle cx="52" cy="161" r="10"/><rect x="74" y="154" width="210" height="14" rx="7"/>
+              </g>
+              <g fill="rgba(34,197,94,.95)">
+                <path d="M46 48l4 4 8-10" fill="none" stroke="rgba(34,197,94,.95)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M46 104l4 4 8-10" fill="none" stroke="rgba(34,197,94,.95)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <text x="24" y="216" font-size="12" fill="rgba(15,23,42,.65)">Fast • Printable • Local-only</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="features" class="container">
+      <h2>What this template demonstrates</h2>
+      <div class="grid-3">
+        <article class="card">
+          <strong>Production SEO baseline</strong>
+          <p>Title/description meta, canonical URL, robots directives, and JSON-LD describing the app.</p>
+        </article>
+        <article class="card">
+          <strong>High performance by default</strong>
+          <p>No frameworks, critical CSS only, minimal JS, no third-party scripts, export/import built in.</p>
+        </article>
+        <article class="card">
+          <strong>Accessible and printable</strong>
+          <p>Keyboard-friendly controls, focus-visible styling, reduced-motion support, and clean print output.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="tracker" class="container">
+      <h2>Daily tracker</h2>
+
+      <div class="card">
+        <div class="tracker-head">
+          <div class="field">
+            <label for="date">Date</label>
+            <input id="date" name="date" type="date" />
+          </div>
+
+          <div class="field" style="min-width:260px;">
+            <label for="goal">Daily goal (optional)</label>
+            <input id="goal" name="goal" type="text" placeholder="E.g., Finish Economics Ch. 2 + 30 Maths questions" />
+          </div>
+
+          <div class="tracker-actions no-print">
+            <button class="btn secondary" type="button" id="saveNowBtn">Save now</button>
+            <button class="btn secondary" type="button" id="exportBtn">Export</button>
+            <button class="btn secondary" type="button" id="importBtn">Import</button>
+            <button class="btn danger" type="button" id="clearDayBtn">Clear this date</button>
+          </div>
+        </div>
+
+        <div class="progress-wrap" aria-label="Completion summary">
+          <div class="statusline" id="summary">
+            <strong>0%</strong> complete • <span id="doneCount">0</span>/<span id="workCount">0</span> work blocks done
+          </div>
+          <progress id="progress" value="0" max="100" aria-label="Completion progress"></progress>
+        </div>
+
+        <p class="small" id="saveStatus" role="status" aria-live="polite"></p>
+
+        <noscript>
+          <p class="callout"><strong>Note:</strong> JavaScript is required to save your progress locally and enable printing/reminders.</p>
+        </noscript>
+
+        <form id="trackerForm" autocomplete="off">
+          <div class="slots" aria-label="Daily schedule blocks">
+
+            <!-- Morning / college -->
+            <article class="slot" data-slot="morning" data-start="05:00">
+              <div class="slot-top">
+                <div>
+                  <div class="time">05:00–11:00 • Morning + College</div>
+                  <div class="hint">Wake up at 05:00, college, return around 11:00.</div>
+                </div>
+              </div>
+
+              <div class="slot-grid">
+                <div>
+                  <label for="morning_status">Status</label>
+                  <select id="morning_status" name="morning_status">
+                    <option value="">Select…</option>
+                    <option value="done">Done ✅</option>
+                    <option value="partial">Partial ⚠️</option>
+                    <option value="missed">Missed ❌</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="morning_mode">Type</label>
+                  <select id="morning_mode" name="morning_mode">
+                    <option value="college">College</option>
+                    <option value="morning">Morning routine</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label for="morning_notes">Notes (topics covered / homework given)</label>
+                <textarea id="morning_notes" name="morning_notes" placeholder="E.g., Accounts: adjustments; Maths: exercise 4.2…"></textarea>
+              </div>
+            </article>
+
+            <!-- 11–1 -->
+            <article class="slot" data-slot="slot11_13" data-start="11:00">
+              <div class="slot-top">
+                <div>
+                  <div class="time">11:00–13:00 • Your choice</div>
+                  <div class="hint">Reading / homework / practice / rest.</div>
+                </div>
+              </div>
+
+              <div class="slot-grid">
+                <div>
+                  <label for="slot11_13_mode">Mode</label>
+                  <select id="slot11_13_mode" name="slot11_13_mode">
+                    <option value="">Select…</option>
+                    <option value="reading">Reading</option>
+                    <option value="homework">Homework</option>
+                    <option value="practice">Practice</option>
+                    <option value="rest">Rest</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="slot11_13_subject">Subject</label>
+                  <select id="slot11_13_subject" name="slot11_13_subject">
+                    <option value="">Select…</option>
+                    <option>Nepali</option>
+                    <option>Maths</option>
+                    <option>English</option>
+                    <option>Computer</option>
+                    <option>Economics</option>
+                    <option>Accounts</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="slot11_13_topic">Chapter / task</label>
+                  <input id="slot11_13_topic" name="slot11_13_topic" type="text" placeholder="E.g., Ch. 1 summary / HW set 2" />
+                </div>
+                <div>
+                  <label for="slot11_13_status">Completion</label>
+                  <select id="slot11_13_status" name="slot11_13_status">
+                    <option value="">Select…</option>
+                    <option value="done">Done ✅</option>
+                    <option value="partial">Partial ⚠️</option>
+                    <option value="missed">Missed ❌</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label for="slot11_13_notes">Notes</label>
+                <textarea id="slot11_13_notes" name="slot11_13_notes" placeholder="What exactly did you do?"></textarea>
+              </div>
+            </article>
+
+            <!-- 1–3 -->
+            <article class="slot" data-slot="slot13_15" data-start="13:00">
+              <div class="slot-top">
+                <div>
+                  <div class="time">13:00–15:00 • Study / Homework</div>
+                  <div class="hint">Choose reading or homework. Record subject + chapter/task.</div>
+                </div>
+              </div>
+
+              <div class="slot-grid">
+                <div>
+                  <label for="slot13_15_mode">Mode</label>
+                  <select id="slot13_15_mode" name="slot13_15_mode">
+                    <option value="">Select…</option>
+                    <option value="reading">Reading</option>
+                    <option value="homework">Homework</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="slot13_15_subject">Subject</label>
+                  <select id="slot13_15_subject" name="slot13_15_subject">
+                    <option value="">Select…</option>
+                    <option>Nepali</option>
+                    <option>Maths</option>
+                    <option>English</option>
+                    <option>Computer</option>
+                    <option>Economics</option>
+                    <option>Accounts</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="slot13_15_topic">Chapter / homework done</label>
+                  <input id="slot13_15_topic" name="slot13_15_topic" type="text" placeholder="E.g., Economics Ch. 3 or Maths HW Q1–Q15" />
+                </div>
+                <div>
+                  <label for="slot13_15_status">Completion</label>
+                  <select id="slot13_15_status" name="slot13_15_status">
+                    <option value="">Select…</option>
+                    <option value="done">Done ✅</option>
+                    <option value="partial">Partial ⚠️</option>
+                    <option value="missed">Missed ❌</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label for="slot13_15_notes">Notes</label>
+                <textarea id="slot13_15_notes" name="slot13_15_notes" placeholder="Details: which questions/pages/chapter points?"></textarea>
+              </div>
+            </article>
+
+            <!-- 4–5 -->
+            <article class="slot" data-slot="slot16_17" data-start="16:00">
+              <div class="slot-top">
+                <div>
+                  <div class="time">16:00–17:00 • Accounts or Computer practice</div>
+                  <div class="hint">Practical work: exercises, software, typing, ledger practice, etc.</div>
+                </div>
+              </div>
+
+              <div class="slot-grid">
+                <div>
+                  <label for="slot16_17_mode">Mode</label>
+                  <select id="slot16_17_mode" name="slot16_17_mode">
+                    <option value="practice">Practice</option>
+                    <option value="reading">Reading</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="slot16_17_subject">Subject</label>
+                  <select id="slot16_17_subject" name="slot16_17_subject">
+                    <option value="">Select…</option>
+                    <option>Accounts</option>
+                    <option>Computer</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="slot16_17_topic">Practice task</label>
+                  <input id="slot16_17_topic" name="slot16_17_topic" type="text" placeholder="E.g., Final accounts set 1 / Excel practice" />
+                </div>
+                <div>
+                  <label for="slot16_17_status">Completion</label>
+                  <select id="slot16_17_status" name="slot16_17_status">
+                    <option value="">Select…</option>
+                    <option value="done">Done ✅</option>
+                    <option value="partial">Partial ⚠️</option>
+                    <option value="missed">Missed ❌</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label for="slot16_17_notes">Notes</label>
+                <textarea id="slot16_17_notes" name="slot16_17_notes" placeholder="What did you practise? Any mistakes to fix?"></textarea>
+              </div>
+            </article>
+
+            <!-- 5–8 rest -->
+            <article class="slot" data-slot="slot17_20" data-start="17:00">
+              <div class="slot-top">
+                <div>
+                  <div class="time">17:00–20:00 • Rest</div>
+                  <div class="hint">Rest until 20:00. (Optional to record.)</div>
+                </div>
+              </div>
+
+              <div class="slot-grid">
+                <div>
+                  <label for="slot17_20_mode">Mode</label>
+                  <select id="slot17_20_mode" name="slot17_20_mode">
+                    <option value="rest">Rest</option>
+                    <option value="family">Family</option>
+                    <option value="exercise">Exercise</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="slot17_20_status">Status</label>
+                  <select id="slot17_20_status" name="slot17_20_status">
+                    <option value="">Select…</option>
+                    <option value="done">Rested ✅</option>
+                    <option value="partial">Partial ⚠️</option>
+                    <option value="missed">Not rested ❌</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label for="slot17_20_notes">Notes (optional)</label>
+                <textarea id="slot17_20_notes" name="slot17_20_notes" placeholder="E.g., nap, walk, dinner…"></textarea>
+              </div>
+            </article>
+
+            <!-- 8–9 -->
+            <article class="slot" data-slot="slot20_21" data-start="20:00">
+              <div class="slot-top">
+                <div>
+                  <div class="time">20:00–21:00 • Study / Homework</div>
+                  <div class="hint">Your choice: reading or homework.</div>
+                </div>
+              </div>
+
+              <div class="slot-grid">
+                <div>
+                  <label for="slot20_21_mode">Mode</label>
+                  <select id="slot20_21_mode" name="slot20_21_mode">
+                    <option value="">Select…</option>
+                    <option value="reading">Reading</option>
+                    <option value="homework">Homework</option>
+                    <option value="revision">Revision</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="slot20_21_subject">Subject</label>
+                  <select id="slot20_21_subject" name="slot20_21_subject">
+                    <option value="">Select…</option>
+                    <option>Nepali</option>
+                    <option>Maths</option>
+                    <option>English</option>
+                    <option>Computer</option>
+                    <option>Economics</option>
+                    <option>Accounts</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="slot20_21_topic">Chapter / homework done</label>
+                  <input id="slot20_21_topic" name="slot20_21_topic" type="text" placeholder="E.g., English writing task / Nepali grammar" />
+                </div>
+                <div>
+                  <label for="slot20_21_status">Completion</label>
+                  <select id="slot20_21_status" name="slot20_21_status">
+                    <option value="">Select…</option>
+                    <option value="done">Done ✅</option>
+                    <option value="partial">Partial ⚠️</option>
+                    <option value="missed">Missed ❌</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label for="slot20_21_notes">Notes</label>
+                <textarea id="slot20_21_notes" name="slot20_21_notes"></textarea>
+              </div>
+            </article>
+
+            <!-- 9–10 math practice only -->
+            <article class="slot" data-slot="slot21_22" data-start="21:00">
+              <div class="slot-top">
+                <div>
+                  <div class="time">21:00–22:00 • Maths practice only</div>
+                  <div class="hint">Practice questions; record topic and quantity.</div>
+                </div>
+              </div>
+
+              <div class="slot-grid">
+                <div>
+                  <label for="slot21_22_mode">Mode</label>
+                  <select id="slot21_22_mode" name="slot21_22_mode">
+                    <option value="practice">Practice</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="slot21_22_subject">Subject</label>
+                  <select id="slot21_22_subject" name="slot21_22_subject">
+                    <option>Maths</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="slot21_22_topic">Topic</label>
+                  <input id="slot21_22_topic" name="slot21_22_topic" type="text" placeholder="E.g., Trigonometry identities / Integration" />
+                </div>
+                <div>
+                  <label for="slot21_22_status">Completion</label>
+                  <select id="slot21_22_status" name="slot21_22_status">
+                    <option value="">Select…</option>
+                    <option value="done">Done ✅</option>
+                    <option value="partial">Partial ⚠️</option>
+                    <option value="missed">Missed ❌</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label for="slot21_22_notes">Notes (questions count, errors, what to revise)</label>
+                <textarea id="slot21_22_notes" name="slot21_22_notes" placeholder="E.g., 25 questions; revise #7 and #19; formula mistakes…"></textarea>
+              </div>
+            </article>
+
+          </div>
+        </form>
+
+        <div class="small">
+          Tip: Use <strong>Export</strong> once a week as a backup. Printing produces a clean report for teachers/parents.
+        </div>
+      </div>
+    </section>
+
+    <section id="reminders" class="container">
+      <h2>Reminders and loud alarms</h2>
+
+      <div class="rem-grid">
+        <div class="card">
+          <p class="callout">
+            <strong>Reality check:</strong> a normal web page cannot guarantee alarms when the tab/browser is closed.
+            For reliable alarms, use Windows alarms. This section provides an in-browser helper for when the page is open.
+          </p>
+
+          <div class="tracker-actions no-print" style="margin-top:12px;">
+            <button class="btn" type="button" id="enableAudioBtn">Enable loud sound</button>
+            <button class="btn secondary" type="button" id="enableNotifBtn">Enable desktop notifications</button>
+            <button class="btn secondary" type="button" id="testAlarmBtn">Test alarm</button>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label for="volume">Alarm loudness (depends on system volume)</label>
+            <input id="volume" type="range" min="0" max="100" value="75" />
+            <p class="small" id="permStatus" aria-live="polite"></p>
+          </div>
+
+          <details style="margin-top:12px;">
+            <summary><strong>Choose which block starts should notify</strong></summary>
+            <div class="small" style="margin-top:10px;">
+              <label><input type="checkbox" class="remCheck" value="11:00" checked /> 11:00 — start 11:00–13:00</label><br>
+              <label><input type="checkbox" class="remCheck" value="13:00" checked /> 13:00 — start 13:00–15:00</label><br>
+              <label><input type="checkbox" class="remCheck" value="16:00" checked /> 16:00 — start 16:00–17:00</label><br>
+              <label><input type="checkbox" class="remCheck" value="20:00" checked /> 20:00 — start 20:00–21:00</label><br>
+              <label><input type="checkbox" class="remCheck" value="21:00" checked /> 21:00 — start 21:00–22:00 (Maths)</label><br><br>
+              <button class="btn secondary" type="button" id="startRemBtn">Start in-browser reminders</button>
+              <button class="btn secondary" type="button" id="stopRemBtn" disabled>Stop reminders</button>
+            </div>
+          </details>
+        </div>
+
+        <div class="card">
+          <strong>Best practice for guaranteed alarms</strong>
+          <p class="small">
+            Use Windows Clock alarms and allow Chrome notifications in Windows. The deployment section below includes
+            exact steps.
+          </p>
+
+          <strong style="display:block; margin-top:12px;">Browser limitations to know</strong>
+          <p class="small">
+            Browsers restrict autoplaying audio. Your first click on “Enable loud sound” unlocks audio for later beeps.
+            Notification permission should be requested via a user gesture. Notifications require HTTPS in supporting browsers.
+          </p>
+
+          <strong style="display:block; margin-top:12px;">Safety note</strong>
+          <p class="small">
+            “Loud” is limited by your device volume. Avoid uncomfortable sound levels.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy" class="container">
+      <h2>Privacy and analytics</h2>
+
+      <div class="card">
+        <p class="callout">
+          <strong>No third-party analytics by default.</strong> This template stores your data locally and does not send it anywhere.
+        </p>
+
+        <p class="small">
+          Data is stored using your browser’s local storage and stays across sessions on the same device/browser profile.
+          You can export/import or delete everything at any time.
+        </p>
+
+        <div class="tracker-actions no-print" style="margin-top:12px;">
+          <button class="btn danger" type="button" id="wipeAllBtn">Delete all local data</button>
+        </div>
+
+        <details style="margin-top:12px;">
+          <summary><strong>If you add analytics later</strong></summary>
+          <p class="small">
+            If you introduce analytics cookies or similar tracking, you may need user consent depending on jurisdiction.
+            Prefer first-party, privacy-preserving approaches and collect the minimum necessary.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" aria-hidden="true" role="alert" aria-live="assertive">
+      <p class="t-title" id="toastTitle">Reminder</p>
+      <p class="t-body" id="toastBody">It’s time to start.</p>
+    </div>
+
+    <footer class="container">
+      <p>
+        <strong>Deployment note:</strong> replace <code>https://example.com/</code> with your real domain, and consider adding
+        a sitemap and robots.txt. Run Lighthouse and fix any warnings before publishing.
+      </p>
+      <p class="small">© StudyTracker template — single-file demo</p>
+    </footer>
+  </main>
+
+  <!-- Minimal JS, loaded after HTML parse (module scripts are deferred by default). -->
+  <script type="module">
+    'use strict';
+
+    /* =========================
+       Helpers
+    ========================== */
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+    function pad2(n){ return String(n).padStart(2, '0'); }
+    function isoDateLocal(d = new Date()){
+      // Local date (not UTC) for correct daily tracking.
+      return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+    }
+
+    // Feature-detect localStorage availability (private mode / quotas can affect it).
+    function storageAvailable(){
+      try{
+        const x = '__st__';
+        localStorage.setItem(x, x);
+        localStorage.removeItem(x);
+        return true;
+      }catch(_e){
+        return false;
+      }
+    }
+
+    const STORAGE_PREFIX = 'studytracker:v1:';
+    const THEME_KEY = 'studytracker:theme';
+    const REM_KEY = 'studytracker:reminders:v1';
+
+    function keyForDate(iso){ return STORAGE_PREFIX + iso; }
+
+    function readJSON(key, fallback = null){
+      try{
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      }catch(_e){
+        return fallback;
+      }
+    }
+    function writeJSON(key, value){
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    /* =========================
+       Theme toggle
+    ========================== */
+    const themeBtn = $('#themeBtn');
+
+    function currentTheme(){
+      return localStorage.getItem(THEME_KEY) || 'auto'; // 'auto' | 'light' | 'dark'
+    }
+    function applyTheme(theme){
+      if(theme === 'auto'){
+        document.documentElement.removeAttribute('data-theme');
+      }else{
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+      localStorage.setItem(THEME_KEY, theme);
+      themeBtn.textContent = theme === 'auto' ? 'Theme: Auto' : `Theme: ${theme[0].toUpperCase()+theme.slice(1)}`;
+    }
+    function cycleTheme(){
+      const t = currentTheme();
+      const next = t === 'auto' ? 'dark' : (t === 'dark' ? 'light' : 'auto');
+      applyTheme(next);
+    }
+
+    /* =========================
+       Tracker save/load
+    ========================== */
+    const dateInput = $('#date');
+    const goalInput = $('#goal');
+    const form = $('#trackerForm');
+    const saveStatus = $('#saveStatus');
+    const summary = $('#summary');
+    const progress = $('#progress');
+    const doneCountEl = $('#doneCount');
+    const workCountEl = $('#workCount');
+
+    // Slots considered "work" for completion stats (rest is excluded).
+    const WORK_SLOTS = ['morning','slot11_13','slot13_15','slot16_17','slot20_21','slot21_22'];
+
+    function collectState(){
+      const fd = new FormData(form);
+      const state = { meta: { goal: goalInput.value || '' }, fields: {} };
+      for(const [k,v] of fd.entries()){
+        state.fields[k] = v;
+      }
+      return state;
+    }
+
+    function applyState(state){
+      goalInput.value = state?.meta?.goal ?? '';
+      const fields = state?.fields || {};
+      for(const [name, value] of Object.entries(fields)){
+        const el = form.elements.namedItem(name);
+        if(el) el.value = value;
+      }
+      updateStats();
+    }
+
+    function loadForDate(iso){
+      if(!storageAvailable()){
+        saveStatus.textContent = 'Local storage unavailable in this browser mode. Export won’t work.';
+        return;
+      }
+      const state = readJSON(keyForDate(iso), { meta:{goal:''}, fields:{} });
+      // Clear form first to avoid stale values if key is missing.
+      form.reset();
+      applyState(state);
+      saveStatus.textContent = 'Loaded.';
+    }
+
+    function saveForDate(iso){
+      if(!storageAvailable()) return;
+      const state = collectState();
+      writeJSON(keyForDate(iso), state);
+      saveStatus.textContent = 'Saved ✅';
+      window.setTimeout(() => { saveStatus.textContent = ''; }, 900);
+      updateStats();
+    }
+
+    // Debounced autosave (avoids saving on every keystroke at full speed).
+    let saveTimer = null;
+    function scheduleSave(){
+      window.clearTimeout(saveTimer);
+      saveTimer = window.setTimeout(() => saveForDate(dateInput.value), 250);
+    }
+
+    function updateStats(){
+      const fields = new FormData(form);
+
+      let done = 0;
+      let work = 0;
+
+      for(const slot of WORK_SLOTS){
+        const status = fields.get(`${slot}_status`);
+        work += 1;
+        if(status === 'done') done += 1;
+      }
+
+      const pct = work ? Math.round((done / work) * 100) : 0;
+      doneCountEl.textContent = String(done);
+      workCountEl.textContent = String(work);
+      progress.value = pct;
+      summary.innerHTML = `<strong>${pct}%</strong> complete • <span id="doneCount">${done}</span>/<span id="workCount">${work}</span> work blocks done`;
+    }
+
+    /* =========================
+       Export / Import
+    ========================== */
+    function download(filename, text){
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportAll(){
+      const iso = dateInput.value;
+      const state = readJSON(keyForDate(iso), collectState());
+      const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        date: iso,
+        theme: currentTheme(),
+        reminders: readJSON(REM_KEY, null),
+        state
+      };
+      download(`studytracker-${iso}.json`, JSON.stringify(payload, null, 2));
+    }
+
+    function importFromFile(file){
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const payload = JSON.parse(String(reader.result || ''));
+          if(payload?.state){
+            writeJSON(keyForDate(dateInput.value), payload.state);
+            if(payload?.theme) applyTheme(payload.theme);
+            if(payload?.reminders) writeJSON(REM_KEY, payload.reminders);
+            loadForDate(dateInput.value);
+            saveStatus.textContent = 'Imported ✅';
+          }else{
+            saveStatus.textContent = 'Import file missing state.';
+          }
+        }catch(_e){
+          saveStatus.textContent = 'Invalid JSON file.';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* =========================
+       Printing
+    ========================== */
+    $('#printBtn').addEventListener('click', () => window.print());
+
+    /* =========================
+       Reminders (Notifications + Web Audio)
+       Limitations: only reliable while page is open; background timers can be throttled.
+    ========================== */
+    const permStatus = $('#permStatus');
+    const toast = $('#toast');
+    const toastTitle = $('#toastTitle');
+    const toastBody = $('#toastBody');
+
+    const enableAudioBtn = $('#enableAudioBtn');
+    const enableNotifBtn = $('#enableNotifBtn');
+    const testAlarmBtn = $('#testAlarmBtn');
+    const startRemBtn = $('#startRemBtn');
+    const stopRemBtn = $('#stopRemBtn');
+    const volume = $('#volume');
+
+    let audioCtx = null;
+    let remindersInterval = null;
+    let lastFiredKey = '';
+
+    function showToast(title, body){
+      toastTitle.textContent = title;
+      toastBody.textContent = body;
+      toast.setAttribute('aria-hidden', 'false');
+      window.setTimeout(() => toast.setAttribute('aria-hidden','true'), 9000);
+    }
+
+    function beep(){
+      if(!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      const vol = Math.max(0, Math.min(1, Number(volume.value) / 100));
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(880, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.02, vol), now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.82);
+    }
+
+    async function enableAudio(){
+      try{
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if(!Ctx){
+          permStatus.textContent = 'Web Audio not supported in this browser.';
+          return;
+        }
+        if(!audioCtx) audioCtx = new Ctx();
+        if(audioCtx.state !== 'running'){
+          await audioCtx.resume(); // user gesture required in modern browsers.
+        }
+        permStatus.textContent = 'Audio enabled ✅';
+        beep();
+      }catch(_e){
+        permStatus.textContent = 'Audio blocked. Try clicking again.';
+      }
+    }
+
+    async function enableNotifications(){
+      try{
+        if(!('Notification' in window)){
+          permStatus.textContent = 'Notifications not supported in this browser.';
+          return;
+        }
+        // Request permission in response to a user gesture.
+        const res = await Notification.requestPermission();
+        permStatus.textContent = `Notifications: ${res}`;
+      }catch(_e){
+        permStatus.textContent = 'Could not request notification permission.';
+      }
+    }
+
+    function notify(title, body){
+      // System notification if allowed
+      if('Notification' in window && Notification.permission === 'granted'){
+        try{
+          new Notification(title, { body, tag: 'studytracker-reminder' });
+        }catch(_e){ /* ignore */ }
+      }
+      // Always show in-page toast
+      showToast(title, body);
+      // Optional sound
+      beep();
+    }
+
+    function selectedReminderTimes(){
+      const times = $$('.remCheck').filter(c => c.checked).map(c => c.value);
+      return times;
+    }
+
+    function hhmmToMinutes(hhmm){
+      const [hh, mm] = hhmm.split(':').map(Number);
+      return (hh*60) + mm;
+    }
+
+    function startReminders(){
+      if(remindersInterval) return;
+
+      const enabledTimes = selectedReminderTimes();
+      writeJSON(REM_KEY, { enabledTimes });
+
+      permStatus.textContent = 'Reminders started (page must remain open).';
+      stopRemBtn.disabled = false;
+      startRemBtn.disabled = true;
+
+      remindersInterval = window.setInterval(() => {
+        const now = new Date();
+        const iso = isoDateLocal(now);
+        const minutes = now.getHours() * 60 + now.getMinutes();
+
+        const fireKey = `${iso}:${minutes}`;
+        if(fireKey === lastFiredKey) return; // prevent duplicates within same minute
+
+        const timesMin = enabledTimes.map(hhmmToMinutes);
+        if(timesMin.includes(minutes)){
+          lastFiredKey = fireKey;
+          const hhmm = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+          notify('StudyTracker reminder', `It’s ${hhmm}. Start your scheduled study block.`);
+        }
+      }, 25000);
+    }
+
+    function stopReminders(){
+      if(remindersInterval){
+        window.clearInterval(remindersInterval);
+        remindersInterval = null;
+      }
+      permStatus.textContent = 'Reminders stopped.';
+      stopRemBtn.disabled = true;
+      startRemBtn.disabled = false;
+    }
+
+    /* =========================
+       Wire up UI
+    ========================== */
+    // Initialise theme + date
+    applyTheme(currentTheme());
+    themeBtn.addEventListener('click', cycleTheme);
+
+    dateInput.value = isoDateLocal();
+    if(storageAvailable()) loadForDate(dateInput.value);
+
+    // Autosave
+    form.addEventListener('input', scheduleSave);
+    goalInput.addEventListener('input', scheduleSave);
+
+    // Date change loads that day's data
+    dateInput.addEventListener('change', () => loadForDate(dateInput.value));
+
+    // Buttons
+    $('#saveNowBtn').addEventListener('click', () => saveForDate(dateInput.value));
+    $('#clearDayBtn').addEventListener('click', () => {
+      const iso = dateInput.value;
+      localStorage.removeItem(keyForDate(iso));
+      form.reset();
+      goalInput.value = '';
+      updateStats();
+      saveStatus.textContent = 'Cleared this date.';
+    });
+
+    $('#exportBtn').addEventListener('click', exportAll);
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/json';
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', () => {
+      if(fileInput.files && fileInput.files[0]) importFromFile(fileInput.files[0]);
+      fileInput.value = '';
+    });
+    document.body.appendChild(fileInput);
+
+    $('#importBtn').addEventListener('click', () => fileInput.click());
+
+    $('#wipeAllBtn').addEventListener('click', () => {
+      const ok = confirm('Delete all StudyTracker data stored in this browser?');
+      if(!ok) return;
+      const keys = Object.keys(localStorage);
+      for(const k of keys){
+        if(k.startsWith(STORAGE_PREFIX) || k === THEME_KEY || k === REM_KEY){
+          localStorage.removeItem(k);
+        }
+      }
+      form.reset();
+      goalInput.value = '';
+      applyTheme('auto');
+      updateStats();
+      saveStatus.textContent = 'All local data deleted.';
+    });
+
+    // Reminders
+    enableAudioBtn.addEventListener('click', enableAudio);
+    enableNotifBtn.addEventListener('click', enableNotifications);
+    testAlarmBtn.addEventListener('click', () => { showToast('Test alarm', 'If you enabled sound, you should hear a beep.'); beep(); });
+    startRemBtn.addEventListener('click', startReminders);
+    stopRemBtn.addEventListener('click', stopReminders);
+
+    // Load reminder preferences
+    if(storageAvailable()){
+      const r = readJSON(REM_KEY, null);
+      if(r?.enabledTimes){
+        for(const c of $$('.remCheck')){
+          c.checked = r.enabledTimes.includes(c.value);
+        }
+      }
+    }
+
+    updateStats();
+  </script>
+</body>
+</html>
